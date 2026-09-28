@@ -1,5 +1,6 @@
 package in.ashokit.controller;
 
+import in.ashokit.exception.ResourceNotFoundException;
 import in.ashokit.model.Product;
 import in.ashokit.service.ProductService;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class ProductRestController {
 
     private ProductService service;
@@ -17,11 +19,13 @@ public class ProductRestController {
         this.service = service;
     }
 
+
     @PostMapping(value = "/save")
     public ResponseEntity<Product> storeProduct(@RequestBody Product product) {
         Product productFromService = service.saveProduct(product);
         return new ResponseEntity<>(productFromService, HttpStatus.CREATED);
     }
+
 
     @GetMapping(value = "/product/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable String id) {
@@ -29,7 +33,7 @@ public class ProductRestController {
         if (productFromService != null)
             return new ResponseEntity<>(productFromService, HttpStatus.OK);
         else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("product with id: "+id + "doesn't exist");
     }
 
     @PutMapping(value = "/update")
